@@ -1,0 +1,23 @@
+name: Restrict changes to /ablage
+
+on:
+  pull_request:
+    branches: [ main ]  # Change if your default branch is not "main"
+
+jobs:
+  restrict-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check changed files
+        uses: tj-actions/changed-files@v45
+        id: changes
+
+      - name: Fail if files outside /ablage are modified
+        run: |
+          for file in ${{ steps.changes.outputs.all_changed_files }}; do
+            if [[ ! $file == ablage/* ]]; then
+              echo "❌ Illegal change detected: $file"
+              exit 1
+            fi
+          done
+          echo "✅ All changes are inside /ablage."
